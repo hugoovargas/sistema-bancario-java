@@ -1,65 +1,56 @@
 package model;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import Exception.*;
 
 
 public abstract class Account {
     private static int idCounter = 1;
+    protected String clientId;
     protected final String id;
-    private final String ownerCpf;
-    private String branch;
-    protected double balance;
-    protected LocalDateTime creationTime;
-    protected List<Transaction> transactionHistory;
+    protected String branch;
+    protected BigDecimal balance;
+    protected final LocalDateTime creationTime;
+    protected final List<Transaction> transactionHistory;
 
-
-    public Account(String ownerCpf) {
+    public Account(String clientId) {
         this.id = idGenerator();
-        this.ownerCpf = ownerCpf;
+        this.clientId = clientId;
         this.branch = "0001";
-        this.balance = 0;
+        this.balance = BigDecimal.ZERO;
         this.creationTime = LocalDateTime.now();
         this.transactionHistory = new ArrayList<>();
     }
-    public boolean deposit(double value){
-        if(value <= 0) return false;
-        this.balance += value;
-        addTransaction(new Transaction(TypeTransaction.DEPOSIT, value, null, this));
-        return true;
+    public void deposit(BigDecimal value) throws InvalidAmountException {
+        if (value.compareTo(BigDecimal.ZERO) <= 0)
+            throw new InvalidAmountException("Valor inválido");
+        this.balance = this.balance.add(value).setScale(2, RoundingMode.HALF_UP);
     }
+
     public void addTransaction(Transaction transaction) {
         this.transactionHistory.add(transaction);
     }
     public List<Transaction> getTransactionHistory() {
         return Collections.unmodifiableList(transactionHistory);
     }
-    public abstract boolean withdraw(double value);
+    public abstract void withdraw(BigDecimal value) throws InvalidAmountException, InsufficientBalanceException;
+    public String getClientId() { return clientId; }
     private String idGenerator() {
         return String.format("%06d", idCounter++); // ex: 000001, 000002
     }
     public String getId() {
         return id;
     }
-    public String getBranch() {
-        return branch;
-    }
-    public void setBranch(String branch) {
-        this.branch = branch;
-    }
-    public double getBalance() {
+    public BigDecimal getBalance() {
         return balance;
-    }
-    public void setBalance(double balance) {
-        this.balance = balance;
     }
     public LocalDateTime getCreationTime() {
         return creationTime;
-    }
-    public String getOwnerCpf() {
-        return ownerCpf;
     }
     @Override
     public String toString() {
@@ -67,4 +58,3 @@ public abstract class Account {
     }
     public abstract String getAccountType();
 }
-

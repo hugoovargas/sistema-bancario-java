@@ -1,152 +1,88 @@
 package service;
 
+
+
+
 import model.*;
-import java.util.HashMap;
+import Exception.*;
+
+
+import java.math.BigDecimal;
 import java.util.List;
-import java.util.Map;
+
+
+
 
 public class BankService {
-    private final Map<String, Client> clientMap;
-    private final Map<String, Account> accountMap;
+    private final ClientService clientService;
+    private final AccountService accountService;
+    private final TransactionService transactionService;
 
 
     public BankService() {
-        this.clientMap = new HashMap<>();
-        this.accountMap = new HashMap<>();
+        this.clientService = new ClientService();
+        this.accountService = new AccountService();
+        this.transactionService = new TransactionService(accountService);
     }
 
 
-    public void addClient(String name, String cpf, String email){
-        if(!isCPFValid(cpf)) throw new IllegalArgumentException("CPF Inválido");
+    public void createClient(String name, String cpf, String email) throws CpfAlreadyExistsException, InvalidCpfException {
+        clientService.addClient(name, cpf, email);
+    }
 
 
-        if(clientMap.containsKey(cpf)){
-            throw new IllegalArgumentException("CPF JÁ CADASTRADO");
+    public Account createAccount(String cpf, TypeAccount type) throws ClientNotFoundException {
+        return accountService.addAccount(cpf, type);
+    }
+
+
+    public Client getClient(String cpf) throws ClientNotFoundException {
+        return clientService.get(cpf);
+    }
+
+
+    public Account getAccount(String id) throws AccountNotFoundException {
+        return accountService.get(id);
+    }
+
+
+    public List<Account> getAccountsByClient(String cpf) throws InvalidCpfException, AccountNotFoundException {
+        if(accountService.getAccountsByClient(cpf).isEmpty()){
+            throw new AccountNotFoundException("Cliente não possui nenhuma conta");
         }
-        Client client = new Client(name, cpf, email);
-        clientMap.put(cpf, client);
+        return accountService.getAccountsByClient(cpf);
     }
 
 
-    public Account addAccount(String cpf, TypeAccount type){
-        Client client = clientMap.get(cpf);
-        if(client == null) throw new IllegalArgumentException("Cliente não encontrado");
-
-
-        Account account;
-
-
-        if(type == TypeAccount.CHECKING){
-            account = new CheckingAccount(cpf);
-        }else{
-            account = new SavingsAccount(cpf);
-        }
-        client.addAccount(account);
-        accountMap.put(account.getId(), account);
-        return account;
+    public void deposit(String id, BigDecimal value) throws InvalidAmountException, InvalidTransferException,
+            AccountNotFoundException {
+        transactionService.deposit(id, value);
     }
 
 
-    public List<Account> getAccountsByCpf(String cpf) {
-        Client client = clientMap.get(cpf);
-
-
-        if (client == null) {
-            throw new IllegalArgumentException("Cliente não encontrado");
-        }
-
-
-        return List.copyOf(client.getAccounts());
+    public void withdraw(String id, BigDecimal value) throws InvalidAmountException, InsufficientBalanceException,
+            InvalidTransferException, AccountNotFoundException {
+        transactionService.withdraw(id, value);
     }
 
 
-    public boolean deposit(String id, double value){
-        Account account = getAccountsById(id);
+    public void transfer(String fromId, String toId, BigDecimal value) throws InvalidAmountException, InsufficientBalanceException,
+            InvalidTransferException, AccountNotFoundException {
 
 
-        if(account == null) throw new IllegalArgumentException("Conta não encontrada");
-
-
-        return account.deposit(value);
+        transactionService.transfer(fromId, toId, value);
     }
 
 
-    public boolean withdraw(String id, double value){
-        Account account = getAccountsById(id);
+    public Account getAccountOfClient(String cpf, String accountId)
+            throws AccountNotFoundException {
 
 
-        if(account == null) throw new IllegalArgumentException("Conta não encontrada");
-
-
-        return account.withdraw(value);
+        return accountService.getAccountOfClient(cpf, accountId);
     }
 
 
-    private Account getAccountsById(String id){
-        return accountMap.get(id);
-    }
-
-
-    public double getAccountBalance(String accountId) {
-        Account account = accountMap.get(accountId);
-
-
-        if (account == null)
-            throw new IllegalArgumentException("Conta não encontrada");
-
-
-        return account.getBalance();
-    }
-
-
-    private boolean isCPFValid(String cpf) {
-        if (cpf == null) return false;
-
-
-        cpf = cpf.replaceAll("[^0-9]", "");
-
-
-        if (cpf.length() != 11) return false;
-
-
-        // Bloqueia CPFs com todos os números iguais
-        if (cpf.matches("(\\d)\\1{10}")) return false;
-
-
-        try {
-            int sum = 0;
-
-
-            // 1º dígito
-            for (int i = 0; i < 9; i++) {
-                sum += (cpf.charAt(i) - '0') * (10 - i);
-            }
-
-
-            int firstDigit = 11 - (sum % 11);
-            if (firstDigit >= 10) firstDigit = 0;
-
-
-            if (firstDigit != (cpf.charAt(9) - '0')) return false;
-
-
-            // 2º dígito
-            sum = 0;
-            for (int i = 0; i < 10; i++) {
-                sum += (cpf.charAt(i) - '0') * (11 - i);
-            }
-
-
-            int secondDigit = 11 - (sum % 11);
-            if (secondDigit >= 10) secondDigit = 0;
-
-
-            return secondDigit == (cpf.charAt(10) - '0');
-
-
-        } catch (Exception e) {
-            return false;
-        }
+    public BigDecimal getAccountBalance(String id) throws AccountNotFoundException {
+        return accountService.getAccountBalance(id);
     }
 }
-

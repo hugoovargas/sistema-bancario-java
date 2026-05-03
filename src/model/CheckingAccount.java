@@ -1,27 +1,26 @@
 package model;
 
-public class CheckingAccount extends Account{
-    private final double withdrawLimit;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import Exception.*;
 
+
+public class CheckingAccount extends Account{
+    private static final BigDecimal WITHDRAW_LIMIT = new BigDecimal("1000");
 
     public CheckingAccount(String ownerCpf) {
         super(ownerCpf);
-        this.withdrawLimit = 1000;
     }
-
 
     @Override
-    public boolean withdraw(double value) {
-        if(value <= 0) return false;
-        double available = balance + withdrawLimit;
-        if(available < value) return false;
+    public void withdraw(BigDecimal value) throws InvalidAmountException, InsufficientBalanceException {
+        if (value.compareTo(BigDecimal.ZERO) <= 0)
+            throw new InvalidAmountException("Valor inválido");
+        BigDecimal available = balance.add(WITHDRAW_LIMIT);
+        if (available.compareTo(value) < 0) throw new InsufficientBalanceException("Saldo Insuficiente");
 
-
-        balance -= value;
-        addTransaction(new Transaction(TypeTransaction.WITHDRAW, value, this, null));
-        return true;
+        balance = balance.subtract(value).setScale(2, RoundingMode.HALF_UP);
     }
-
 
     @Override
     public String getAccountType() {
