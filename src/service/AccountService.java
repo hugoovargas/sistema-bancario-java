@@ -1,76 +1,95 @@
 package service;
 
+import exception.AccountNotFoundException;
+import exception.ClientNotFoundException;
+import exception.InvalidCpfException;
 import model.*;
-import Exception.*;
+import repository.AccountRepository;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.UUID;
 
 
 public class AccountService {
-    private final Map<String, Account> accountMap;
+    private final AccountRepository accountRepository;
+    private final ClientService clientService;
 
-
-    public AccountService(){
-        this.accountMap = new HashMap<>();
+    public AccountService(AccountRepository accountRepository, ClientService clientService){
+        this.accountRepository = accountRepository;
+        this.clientService = clientService;
     }
 
 
-    public Account addAccount(String cpf, TypeAccount type) {
+    public Account save(String cpf, TypeAccount type) throws ClientNotFoundException {
+        Client client = clientService.get(cpf);
+
         Account account;
 
-
         if(type == TypeAccount.CHECKING){
-            account = new CheckingAccount(cpf);
+            account = new CheckingAccount(client.getCpf());
         }else{
-            account = new SavingsAccount(cpf);
+            account = new SavingsAccount(client.getCpf());
         }
-        accountMap.put(account.getId(), account);
-        return account;
+
+        return accountRepository.save(account);
     }
 
 
-    public List<Account> getAccountsByClient(String cpf) throws InvalidCpfException {
+    public List<Account> getAccountsByClient(String cpf) throws InvalidCpfException, ClientNotFoundException {
         if(cpf == null) throw new InvalidCpfException("CPF inválido");
-        return accountMap.values()
-                .stream()
-                .filter(a -> a.getClientId().equals(cpf))
-                .toList();
+
+        Client client = clientService.get(cpf);
+
+        return accountRepository.getAccountsByClient(client.getCpf());
     }
 
 
-    public Account getAccountOfClient(String cpf, String accountId)
-            throws AccountNotFoundException {
+    public Account getAccountOfClient(String cpf, UUID accountId)
+            throws AccountNotFoundException, ClientNotFoundException {
+        Client client = clientService.get(cpf);
 
+        Account account = accountRepository.findById(accountId);
 
-        Account account = get(accountId);
+        if(account == null){
+            throw new AccountNotFoundException("Conta não encontrada");
+        }
 
-
-        if (!account.getClientId().equals(cpf)) {
+        if (!account.getClientCpf().equals(client.getCpf())) {
             throw new AccountNotFoundException("Conta não pertence ao cliente");
         }
 
-
         return account;
     }
 
+    public void deleteAllAccount(String cpf){
+        accountRepository.deleteAllAccount(cpf);
+    }
 
-    public Account get(String id) throws AccountNotFoundException {
-        Account account = accountMap.get(id);
+    public void deleteAccount(UUID id){
+        accountRepository.deleteAccount(id);
+    }
 
+    /*public void deleteAccount(UUID id) throws AccountNotFoundException {
+        if (accountRepository.findById(id) == null) {
+            throw new AccountNotFoundException("Conta não encontrada");
+        }
+        accountRepository.deleteAccount(id);
+    }*/
+
+
+    public Account get(UUID id) throws AccountNotFoundException {
+        Account account = accountRepository.findById(id);
 
         if (account == null) {
             throw new AccountNotFoundException("Conta não encontrada");
         }
 
-
         return account;
     }
 
 
-    public BigDecimal getAccountBalance(String id) throws AccountNotFoundException {
+    public BigDecimal getAccountBalance(UUID id) throws AccountNotFoundException {
         Account account = get(id);
         return account.getBalance();
     }

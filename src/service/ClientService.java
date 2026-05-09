@@ -1,39 +1,39 @@
 package service;
 
+import exception.ClientNotFoundException;
+import exception.CpfAlreadyExistsException;
+import exception.InvalidCpfException;
 import model.Client;
-import Exception.*;
-
-import java.util.HashMap;
-import java.util.Map;
+import repository.ClientRepository;
 
 public class ClientService {
-    private final Map<String, Client> clientMap;
+    private final ClientRepository clientRepository;
 
-
-    public ClientService() {
-        this.clientMap = new HashMap<>();
+    public ClientService(ClientRepository clientRepository) {
+        this.clientRepository = clientRepository;
     }
 
-
-    public void addClient(String name, String cpf, String email) throws InvalidCpfException, CpfAlreadyExistsException {
+    public void save(String name, String cpf, String email) throws InvalidCpfException, CpfAlreadyExistsException {
         if (!isCpfValid(cpf)) throw new InvalidCpfException("CPF Inválido");
 
-        if (clientMap.containsKey(cpf)) {
-            throw new CpfAlreadyExistsException("CPF JÁ CADASTRADO");
+        if(clientRepository.existsByCpf(cpf)){
+            throw new CpfAlreadyExistsException("CPF Já cadastrado");
         }
+
         Client client = new Client(name, cpf, email);
-        clientMap.put(cpf, client);
+
+        clientRepository.save(client);
     }
 
 
     public Client get(String cpf) throws ClientNotFoundException {
-        Client client = clientMap.get(cpf);
+        return clientRepository.findById(cpf);
+    }
 
-        if (client == null) {
-            throw new ClientNotFoundException("Cliente não encontrado");
-        }
+    public void delete(String cpf) throws ClientNotFoundException {
+        Client client = clientRepository.findById(cpf);
 
-        return client;
+        clientRepository.delete(client.getCpf());
     }
 
 

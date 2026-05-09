@@ -3,23 +3,26 @@ package model;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
-import Exception.*;
+import exception.*;
 
 
 public class SavingsAccount extends Account {
     private LocalDateTime lastInterestApply; // data da ultima vez da aplicação de juros
-    private static final BigDecimal INTEREST_RATE = new BigDecimal("1.005");
+    private static final BigDecimal INTEREST_RATE = new BigDecimal("0.005");
 
-    public SavingsAccount(String ownerCpf) {
-        super(ownerCpf);
+    public SavingsAccount(String clientCpf) {
+        super(clientCpf);
         this.lastInterestApply = this.creationTime;
     }
 
     @Override
-    public void withdraw(BigDecimal value) throws InvalidAmountException {
-        if (value.compareTo(BigDecimal.ZERO) <= 0
-                || value.compareTo(balance) > 0)
+    public void withdraw(BigDecimal value) throws InvalidAmountException, InsufficientBalanceException {
+        if (value.compareTo(BigDecimal.ZERO) <= 0)
             throw new InvalidAmountException("Valor inválido");
+
+        if(value.compareTo(balance) > 0) {
+            throw new InsufficientBalanceException("Saldo Insuficiente");
+        }
 
 
         balance = balance.subtract(value).setScale(2, RoundingMode.HALF_UP);
@@ -32,7 +35,12 @@ public class SavingsAccount extends Account {
     public boolean applyInterest(){
         if(!isTimeToApplyInterest()) return false;
 
-        this.balance = this.balance.multiply(INTEREST_RATE).setScale(2, RoundingMode.HALF_UP); //0,5% de juros
+        BigDecimal interest = this.balance.multiply(INTEREST_RATE);
+
+        this.balance = this.balance.add(interest)
+                .setScale(2, RoundingMode.HALF_UP);
+
+        addTransaction(new Transaction(TypeTransaction.INTEREST, interest, null, this));
         lastInterestApply = LocalDateTime.now();
         return true;
     }

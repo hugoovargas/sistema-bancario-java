@@ -2,14 +2,14 @@ package model;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import Exception.*;
+import exception.*;
 
 
 public class CheckingAccount extends Account{
     private static final BigDecimal WITHDRAW_LIMIT = new BigDecimal("1000");
 
-    public CheckingAccount(String ownerCpf) {
-        super(ownerCpf);
+    public CheckingAccount(String clientCpf) {
+        super(clientCpf);
     }
 
     @Override

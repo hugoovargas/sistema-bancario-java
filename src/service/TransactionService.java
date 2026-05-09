@@ -3,11 +3,11 @@ package service;
 import model.Account;
 import model.Transaction;
 import model.TypeTransaction;
-import Exception.*;
+import exception.*;
 
 
 import java.math.BigDecimal;
-
+import java.util.UUID;
 
 public class TransactionService {
     private final AccountService accountService;
@@ -18,7 +18,7 @@ public class TransactionService {
     }
 
 
-    public void deposit(String id, BigDecimal value) throws InvalidAmountException, InvalidTransferException,
+    public void deposit(UUID id, BigDecimal value) throws InvalidAmountException,
             AccountNotFoundException {
 
 
@@ -28,10 +28,7 @@ public class TransactionService {
     }
 
 
-
-
-    public void withdraw(String id, BigDecimal value) throws InvalidAmountException, InsufficientBalanceException,
-            InvalidTransferException, AccountNotFoundException {
+    public void withdraw(UUID id, BigDecimal value) throws InvalidAmountException, InsufficientBalanceException, AccountNotFoundException {
 
 
         Account account = accountService.get(id);
@@ -42,18 +39,18 @@ public class TransactionService {
 
 
 
-    public void transfer(String fromId, String toId, BigDecimal value) throws InvalidAmountException , InsufficientBalanceException,
+    public void transfer(UUID fromId, UUID toId, BigDecimal value) throws InvalidAmountException , InsufficientBalanceException,
             InvalidTransferException, AccountNotFoundException {
-
 
         Account from = accountService.get(fromId);
         Account to = accountService.get(toId);
 
-
-        from.withdraw(value);
-
+        if(from.getId().equals(to.getId())) {
+            throw new InvalidTransferException("Não é possível transferir para a mesma conta");
+        }
 
         try{
+            from.withdraw(value);
             to.deposit(value);
             Transaction t = new Transaction(TypeTransaction.TRANSFER, value, from, to);
             from.addTransaction(t);

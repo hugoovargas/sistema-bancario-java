@@ -2,7 +2,6 @@ package model;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import Exception.*;
 
 public class Transaction {
     private final TypeTransaction type;
@@ -11,10 +10,7 @@ public class Transaction {
     private final Account source;
     private final Account destination;
 
-    public Transaction(TypeTransaction type, BigDecimal amount, Account source, Account destination) throws InvalidTransferException {
-        if(source == null && destination == null){
-            throw new InvalidTransferException("transação sem origem e destino");
-        }
+    public Transaction(TypeTransaction type, BigDecimal amount, Account source, Account destination){
         this.type = type;
         this.amount = amount;
         this.dateTime = LocalDateTime.now();
@@ -40,5 +36,18 @@ public class Transaction {
 
     public Account getDestination() {
         return destination;
+    }
+
+    @Override
+    public String toString() {
+        String sourceId = source != null ? String.valueOf(source.getId()) : "-";
+        String destinationId = destination != null ? String.valueOf(destination.getId()) : "-";
+        return "Transaction{" +
+                "dateTime=" + dateTime +
+                ", type=" + type +
+                ", sourceId=" + sourceId +
+                ", destinationId=" + destinationId +
+                ", amount=" + amount +
+                '}';
     }
 }

@@ -3,6 +3,6 @@ package model;
 public enum TypeTransaction {
     DEPOSIT,
     WITHDRAW,
-    TRANSFER
+    TRANSFER,
+    INTEREST
 }
-

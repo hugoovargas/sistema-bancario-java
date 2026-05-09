@@ -6,21 +6,22 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import Exception.*;
+import java.util.UUID;
+
+import exception.*;
 
 
 public abstract class Account {
-    private static int idCounter = 1;
-    protected String clientId;
-    protected final String id;
+    protected String clientCpf;
+    protected final UUID id;
     protected String branch;
     protected BigDecimal balance;
     protected final LocalDateTime creationTime;
     protected final List<Transaction> transactionHistory;
 
-    public Account(String clientId) {
-        this.id = idGenerator();
-        this.clientId = clientId;
+    public Account(String clientCpf) {
+        this.id = UUID.randomUUID();
+        this.clientCpf = clientCpf;
         this.branch = "0001";
         this.balance = BigDecimal.ZERO;
         this.creationTime = LocalDateTime.now();
@@ -39,13 +40,13 @@ public abstract class Account {
         return Collections.unmodifiableList(transactionHistory);
     }
     public abstract void withdraw(BigDecimal value) throws InvalidAmountException, InsufficientBalanceException;
-    public String getClientId() { return clientId; }
-    private String idGenerator() {
-        return String.format("%06d", idCounter++); // ex: 000001, 000002
-    }
-    public String getId() {
+
+    public String getClientCpf() { return clientCpf; }
+
+    public UUID getId() {
         return id;
     }
+
     public BigDecimal getBalance() {
         return balance;
     }

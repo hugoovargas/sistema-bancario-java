@@ -1,22 +1,23 @@
 package model;
 
+import java.util.UUID;
+
 public class Client {
-    private static int idCounter = 1;
-    private final int id;
+    private final UUID id;
     private String name;
     private final String cpf;
     private String email;
 
 
     public Client(String name, String cpf, String email) {
-        this.id = idCounter++;
+        this.id = UUID.randomUUID();
         this.name = name;
         this.cpf = cpf;
         this.email = email;
     }
-    public int getId() {
+    /*public UUID getId() {
         return id;
-    }
+    }*/
     public String getName() {
         return name;
     }
