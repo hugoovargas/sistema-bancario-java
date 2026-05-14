@@ -16,7 +16,9 @@ public class SavingsAccount extends Account {
     }
 
     @Override
-    public void withdraw(BigDecimal value) throws InvalidAmountException, InsufficientBalanceException {
+    public void withdraw(BigDecimal value)
+            throws InvalidAmountException, InsufficientBalanceException {
+
         if (value.compareTo(BigDecimal.ZERO) <= 0)
             throw new InvalidAmountException("Valor inválido");
 
@@ -40,7 +42,7 @@ public class SavingsAccount extends Account {
         this.balance = this.balance.add(interest)
                 .setScale(2, RoundingMode.HALF_UP);
 
-        addTransaction(new Transaction(TypeTransaction.INTEREST, interest, null, this));
+        addTransaction(new Transaction(TypeTransaction.INTEREST, interest, null, this.getId()));
         lastInterestApply = LocalDateTime.now();
         return true;
     }
