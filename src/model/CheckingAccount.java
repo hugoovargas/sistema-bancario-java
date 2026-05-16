@@ -1,15 +1,18 @@
 package model;
 
+import exception.InsufficientBalanceException;
+import exception.InvalidAmountException;
+import model.valueObjects.AccountIdentity;
+
 import java.math.BigDecimal;
-import java.math.RoundingMode;
-import exception.*;
+import java.util.UUID;
 
 
 public class CheckingAccount extends Account{
     private static final BigDecimal WITHDRAW_LIMIT = new BigDecimal("1000");
 
-    public CheckingAccount(String clientCpf) {
-        super(clientCpf);
+    public CheckingAccount(UUID clientId, AccountIdentity accountIdentity) {
+        super(clientId, accountIdentity);
     }
 
     @Override
@@ -19,10 +22,10 @@ public class CheckingAccount extends Account{
         if (value.compareTo(BigDecimal.ZERO) <= 0)
             throw new InvalidAmountException("Valor inválido");
 
-        BigDecimal available = balance.add(WITHDRAW_LIMIT);
+        BigDecimal available = getBalance().add(WITHDRAW_LIMIT);
         if (available.compareTo(value) < 0) throw new InsufficientBalanceException("Saldo Insuficiente");
 
-        balance = balance.subtract(value).setScale(2, RoundingMode.HALF_UP);
+        this.decreaseBalance(value);
     }
 
     @Override
