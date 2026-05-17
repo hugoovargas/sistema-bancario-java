@@ -1,14 +1,15 @@
 package service;
 
-import exception.*;
 import model.Account;
 import model.AccountType;
 import model.Client;
+import model.Transaction;
+import model.valueObjects.AccountIdentity;
 import model.valueObjects.Cpf;
+import model.valueObjects.Money;
 import repository.AccountRepository;
 import repository.ClientRepository;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -28,21 +29,19 @@ public class ApplicationService {
 
     public void createClient(String name,
                              Cpf cpf,
-                             String email)
-            throws CpfAlreadyExistsException, InvalidCpfException {
+                             String email) {
 
-        clientService.save(name, cpf.toString(), email);
+        clientService.save(name, cpf, email);
     }
 
-    public Account createAccount(String cpf,
+    public Account createAccount(Cpf cpf,
                                  AccountType type)
-            throws ClientNotFoundException {
+    {
 
         return accountService.save(cpf, type);
     }
 
-    public void removeClient(String cpf)
-            throws ClientNotFoundException, AccountDeletionNotAllowedException {
+    public void removeClient(Cpf cpf) {
 
         Client client = clientService.getClient(cpf);
 
@@ -51,59 +50,55 @@ public class ApplicationService {
         clientService.delete(client.getCpf());
     }
 
-    public void removeClientAccount(UUID id)
-            throws AccountNotFoundException, AccountDeletionNotAllowedException {
-
-        accountService.removeClientAccount(id);
+    public void removeClientAccount(AccountIdentity accountIdentity) {
+        accountService.removeClientAccount(accountIdentity);
     }
 
-    public void deposit(UUID id,
-
-                        BigDecimal value)
-            throws InvalidAmountException,
-            AccountNotFoundException {
+    public void deposit(AccountIdentity id,
+                        Money value){
 
         transactionService.deposit(id, value);
     }
 
-    public void withdraw(UUID id,
-                         BigDecimal value)
-            throws InvalidAmountException, InsufficientBalanceException, AccountNotFoundException {
+    public void withdraw(AccountIdentity id,
+                         Money value) {
 
         transactionService.withdraw(id, value);
     }
 
-    public void transfer(UUID fromId,
-                         UUID toId,
-                         BigDecimal value)
-            throws InvalidAmountException, InsufficientBalanceException,
-            InvalidTransferException, AccountNotFoundException {
+    public void transfer(AccountIdentity fromId,
+                         AccountIdentity toId,
+                         Money value) {
 
         transactionService.transfer(fromId, toId, value);
     }
 
-    public List<Account> getClientAccounts(String cpf)
-            throws InvalidCpfException, ClientNotFoundException {
+    public List<AccountIdentity> getClientAccountsIdentity(Cpf cpf) {
 
-        return accountService.getClientAccounts(cpf);
+        return accountService.getClientAccountsIdentity(cpf);
     }
 
-    public Account getClientAccount(String cpf,
-                                    UUID accountId)
-            throws AccountNotFoundException, ClientNotFoundException {
+    public Account getClientAccountIdentity(Cpf cpf,
+                                            UUID accountId) {
 
         return accountService.getClientAccount(cpf, accountId);
     }
 
-    public Client getClient(String cpf)
-            throws ClientNotFoundException { return clientService.getClient(cpf); }
+    public Client getClient(Cpf cpf)
+    { return clientService.getClient(cpf); }
 
-    public Account getAccount(UUID id)
-            throws AccountNotFoundException { return accountService.getAccount(id); }
+    public Account getAccountByIdentity(AccountIdentity accountIdentity)
+    { return accountService.getAccountByAccountIdentity(accountIdentity); }
 
-    public BigDecimal getAccountBalance(UUID id)
-            throws AccountNotFoundException {
+    public Money getAccountBalance(AccountIdentity id)
+    {
 
         return accountService.getAccountBalance(id);
+    }
+
+    public List<Transaction> getAccountTransactions(AccountIdentity accountIdentity){
+        Account account = getAccountByIdentity(accountIdentity);
+
+        return account.getTransactionHistory();
     }
 }

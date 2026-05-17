@@ -2,22 +2,30 @@ package model.valueObjects;
 
 import exception.InvalidCpfException;
 
-public class Cpf {
-    private final String cpf;
+import java.util.Objects;
 
-    public Cpf(String cpf) throws InvalidCpfException {
-        if(!cpfValidator(cpf)){
-            throw new InvalidCpfException("Cpf invalido");
+public record Cpf(String cpf) {
+
+    public Cpf(String cpf) {
+
+        Objects.requireNonNull(cpf);
+
+        String normalizedCpf =
+                cpf.replaceAll("[^0-9]", "");
+
+        if (!cpfValidator(normalizedCpf)) {
+            throw new InvalidCpfException("CPF inválido");
         }
-        this.cpf = cpf;
+
+        this.cpf = normalizedCpf;
     }
 
     @Override
     public String toString() {
-        return cpf;
+        return cpf.replaceFirst("(\\d{3})(\\d{3})(\\d{3})(\\d{2})", "$1.$2.$3-$4");
     }
 
-    private static boolean cpfValidator(String cpf){
+    private static boolean cpfValidator(String cpf) {
 
         if (cpf == null || cpf.isBlank()) return false;
 

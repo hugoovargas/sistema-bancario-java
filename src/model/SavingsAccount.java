@@ -3,6 +3,7 @@ package model;
 import exception.InsufficientBalanceException;
 import exception.InvalidAmountException;
 import model.valueObjects.AccountIdentity;
+import model.valueObjects.Money;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -13,19 +14,18 @@ public class SavingsAccount extends Account {
     private LocalDateTime lastInterestApply; // data da ultima vez da aplicação de juros
     private static final BigDecimal INTEREST_RATE = new BigDecimal("0.005"); // valor juros
 
-    public SavingsAccount(UUID clientId, AccountIdentity accountIdentity) {
-        super(clientId, accountIdentity);
+    public SavingsAccount(UUID clientId, AccountIdentity accountIdentity, AccountType accountType) {
+        super(clientId, accountIdentity, accountType);
         this.lastInterestApply = this.getCreationTime();
     }
 
     @Override
-    public void withdraw(BigDecimal value)
-            throws InvalidAmountException, InsufficientBalanceException {
+    public void withdraw(Money value) {
 
-        if (value.compareTo(BigDecimal.ZERO) <= 0)
+        if (Money.isNegativeOrZero(value))
             throw new InvalidAmountException("Valor inválido");
 
-        if(value.compareTo(getBalance()) > 0) {
+        if(value.isGreaterThan(getBalance())) {
             throw new InsufficientBalanceException("Saldo Insuficiente");
         }
 
@@ -39,17 +39,12 @@ public class SavingsAccount extends Account {
     public boolean applyInterest(){
         if(!isTimeToApplyInterest()) return false;
 
-        BigDecimal interest = getBalance().multiply(INTEREST_RATE);
+        Money interest = getBalance().multiply(INTEREST_RATE);
 
         this.increaseBalance(interest);
 
-        addTransaction(new Transaction(TransactionType.INTEREST, interest, null,this.getId()));
+        addTransaction(new Transaction(TransactionType.INTEREST, interest, null,this.getAccountIdentity()));
         lastInterestApply = LocalDateTime.now();
         return true;
-    }
-
-    @Override
-    public String getAccountType() {
-        return "Conta Poupança";
     }
 }

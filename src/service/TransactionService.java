@@ -1,13 +1,12 @@
 package service;
 
+import exception.InvalidAmountException;
+import exception.InvalidTransferException;
 import model.Account;
 import model.Transaction;
 import model.TransactionType;
-import exception.*;
-
-
-import java.math.BigDecimal;
-import java.util.UUID;
+import model.valueObjects.AccountIdentity;
+import model.valueObjects.Money;
 
 public class TransactionService {
     private final AccountService accountService;
@@ -18,51 +17,44 @@ public class TransactionService {
     }
 
 
-    public void deposit(UUID id,
-                        BigDecimal value)
-            throws InvalidAmountException,
-            AccountNotFoundException {
+    public void deposit(AccountIdentity id,
+                        Money value) {
 
 
-        Account account = accountService.getAccount(id);
+        Account account = accountService.getAccountByAccountIdentity(id);
         account.deposit(value);
-        account.addTransaction(new Transaction(TransactionType.DEPOSIT, value, null, account.getId()));
+        account.addTransaction(new Transaction(TransactionType.DEPOSIT, value, null, account.getAccountIdentity()));
     }
 
 
-    public void withdraw(UUID id,
-                         BigDecimal value)
-            throws InvalidAmountException, InsufficientBalanceException, AccountNotFoundException {
+    public void withdraw(AccountIdentity id,
+                         Money value) {
 
-        Account account = accountService.getAccount(id);
+        Account account = accountService.getAccountByAccountIdentity(id);
         account.withdraw(value);
-        account.addTransaction(new Transaction(TransactionType.WITHDRAW, value, account.getId(), null));
+        account.addTransaction(new Transaction(TransactionType.WITHDRAW, value, account.getAccountIdentity(), null));
     }
 
 
+    public void transfer(AccountIdentity fromId,
+                         AccountIdentity toId,
+                         Money value) {
 
+        Account from = accountService.getAccountByAccountIdentity(fromId);
+        Account to = accountService.getAccountByAccountIdentity(toId);
 
-    public void transfer(UUID fromId,
-                         UUID toId,
-                         BigDecimal value)
-            throws InvalidAmountException , InsufficientBalanceException,
-            InvalidTransferException, AccountNotFoundException {
-
-        Account from = accountService.getAccount(fromId);
-        Account to = accountService.getAccount(toId);
-
-        if(from.getId().equals(to.getId())) {
+        if (from.getId().equals(to.getId())) {
             throw new InvalidTransferException("Não é possível transferir para a mesma conta");
         }
 
         from.withdraw(value);
 
-        try{
+        try {
             to.deposit(value);
-            Transaction t = new Transaction(TransactionType.TRANSFER, value, from.getId(), to.getId());
+            Transaction t = new Transaction(TransactionType.TRANSFER, value, from.getAccountIdentity(), to.getAccountIdentity());
             from.addTransaction(t);
             to.addTransaction(t);
-        }catch(InvalidAmountException e){
+        } catch (InvalidAmountException e) {
             from.deposit(value);
             throw e;
         }
