@@ -6,7 +6,7 @@ import java.util.Objects;
 
 public record Cpf(String cpf) {
 
-    public Cpf(String cpf) {
+    public Cpf {
 
         Objects.requireNonNull(cpf);
 
@@ -16,8 +16,6 @@ public record Cpf(String cpf) {
         if (!cpfValidator(normalizedCpf)) {
             throw new InvalidCpfException("CPF inválido");
         }
-
-        this.cpf = normalizedCpf;
     }
 
     @Override
