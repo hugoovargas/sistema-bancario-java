@@ -4,28 +4,27 @@ import exception.InvalidCpfException;
 
 import java.util.Objects;
 
-public record Cpf(String cpf) {
+public record Cpf(String value) {
 
-    public Cpf {
+    public Cpf{
 
-        Objects.requireNonNull(cpf);
+        Objects.requireNonNull(value);
 
-        String normalizedCpf =
-                cpf.replaceAll("[^0-9]", "");
+        value = value.replaceAll("[^0-9]", "");
 
-        if (!cpfValidator(normalizedCpf)) {
+        if (!cpfValidator(value)) {
             throw new InvalidCpfException("CPF inválido");
         }
     }
 
     @Override
     public String toString() {
-        return cpf.replaceFirst("(\\d{3})(\\d{3})(\\d{3})(\\d{2})", "$1.$2.$3-$4");
+        return value.replaceFirst("(\\d{3})(\\d{3})(\\d{3})(\\d{2})", "$1.$2.$3-$4");
     }
 
     private static boolean cpfValidator(String cpf) {
 
-        if (cpf == null || cpf.isBlank()) return false;
+        if (cpf.isBlank()) return false;
 
         cpf = cpf.replaceAll("[^0-9]", "");
 

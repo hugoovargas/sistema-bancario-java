@@ -22,8 +22,8 @@ public record Money(BigDecimal value) implements Comparable<Money>{
         return value.compareTo(BigDecimal.ZERO) == 0;
     }
 
-    public static boolean isNegativeOrZero(Money money){
-        return money.compareTo(Money.ZERO) <= 0;
+    public boolean isNegativeOrZero(){
+        return value.compareTo(BigDecimal.ZERO) <= 0;
     }
 
     public boolean isGreaterThan(Money other){
