@@ -26,11 +26,11 @@ public class ApplicationService {
         this.transactionService = new TransactionService(accountService, transactionRepository);
     }
 
-    public void createClient(PersonName name,
-                             Cpf cpf,
-                             Email email) {
+    public Client createClient(PersonName name,
+                               Cpf cpf,
+                               Email email) {
 
-        clientService.save(name, cpf, email);
+        return clientService.save(name, cpf, email);
     }
 
     public AccountIdentity createAccount(Cpf cpf,
@@ -49,8 +49,8 @@ public class ApplicationService {
         clientService.delete(client.getCpf());
     }
 
-    public void removeClientAccount(AccountIdentity accountIdentity) {
-        accountService.removeClientAccount(accountIdentity);
+    public void removeAccount(AccountIdentity accountIdentity) {
+        accountService.removeAccount(accountIdentity);
     }
 
     public void deposit(AccountIdentity id,
@@ -86,5 +86,9 @@ public class ApplicationService {
     public List<Transaction> getAccountTransactions(AccountIdentity accountIdentity){
         Account accountByIdentity = accountService.getAccountByAccountIdentity(accountIdentity);
         return transactionService.getTransactionHistory(accountByIdentity.getId());
+    }
+
+    public Client getClient(Cpf cpf) {
+        return clientService.getClientByCpf(cpf);
     }
 }

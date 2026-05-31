@@ -16,21 +16,23 @@ public class ClientService {
         this.clientRepository = clientRepository;
     }
 
-    public void save(PersonName name,
-                     Cpf cpf,
-                     Email email) {
+    public Client save(PersonName name,
+                       Cpf cpf,
+                       Email email) {
 
-        if (clientRepository.findByCpf(cpf).isPresent()) {
+        if (clientRepository.existsByCpf(cpf)) {
             throw new CpfAlreadyExistsException("CPF já cadastrado");
         }
 
-        if (clientRepository.findByEmail(email).isPresent()) {
+        if (clientRepository.existsByEmail(email)) {
             throw new EmailAlreadyExistsException("Email já cadastrado");
         }
 
         Client client = new Client(name, cpf, email);
 
         clientRepository.save(client);
+
+        return client;
     }
 
 
