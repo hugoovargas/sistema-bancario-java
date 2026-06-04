@@ -32,7 +32,7 @@ public final class AccountIdentityGenerator {
         return sum % 10;
     }
 
-    public static AccountIdentity generate() {
+    public static AccountIdentity generate(){
         return new AccountIdentity(generateBranch(), generateAccountNumber());
     }
 }
