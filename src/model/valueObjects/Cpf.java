@@ -8,13 +8,14 @@ public record Cpf(String value) {
 
     public Cpf {
 
-        Objects.requireNonNull(value);
+        Objects.requireNonNull(value, "CPF não pode ser null");
 
         value = value.replaceAll("[^0-9]", "");
 
-        if (!cpfValidator(value)) {
+        if (!isValidCpf(value)) {
             throw new InvalidCpfException("CPF inválido");
         }
+
     }
 
     @Override
@@ -22,11 +23,9 @@ public record Cpf(String value) {
         return value.replaceFirst("(\\d{3})(\\d{3})(\\d{3})(\\d{2})", "$1.$2.$3-$4");
     }
 
-    private static boolean cpfValidator(String cpf) {
+    private static boolean isValidCpf(String cpf) {
 
         if (cpf.isBlank()) return false;
-
-        cpf = cpf.replaceAll("[^0-9]", "");
 
         if (cpf.length() != 11) return false;
 
