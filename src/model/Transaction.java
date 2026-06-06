@@ -1,11 +1,10 @@
 package model;
 
-import model.valueObjects.AccountIdentity;
-import model.valueObjects.Money;
+import model.valueobject.AccountIdentity;
+import model.valueobject.Money;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
 public class Transaction {
@@ -15,20 +14,18 @@ public class Transaction {
     private final AccountIdentity sourceIdentity;
     private final AccountIdentity destinationIdentity;
     private final LocalDateTime dateTime;
-    private static final DateTimeFormatter FORMATTER =
-            DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
 
     public Transaction(TransactionType type,
                        Money amount,
-                       AccountIdentity sourceId,
-                       AccountIdentity destinationId, Clock clock) {
+                       AccountIdentity sourceIdentity,
+                       AccountIdentity destinationIdentity, Clock clock) {
 
         this.id = UUID.randomUUID();
         this.type = type;
         this.amount = amount;
         this.dateTime = LocalDateTime.now(clock);
-        this.sourceIdentity = sourceId;
-        this.destinationIdentity = destinationId;
+        this.sourceIdentity = sourceIdentity;
+        this.destinationIdentity = destinationIdentity;
     }
 
     public UUID getId() {
@@ -53,30 +50,5 @@ public class Transaction {
 
     public AccountIdentity getDestinationId() {
         return destinationIdentity;
-    }
-
-    @Override
-    public String toString() {
-        return """
-                [%s]
-                Data: %s
-                Valor: R$ %s
-                Origem: %s
-                Destino: %s
-                Id: %s
-                """.formatted(
-                type.getDescription(),
-                dateTime.format(FORMATTER),
-                amount,
-                formatIdentity(sourceIdentity),
-                formatIdentity(destinationIdentity),
-                id.toString()
-        );
-    }
-
-    private String formatIdentity(AccountIdentity identity) {
-        if (identity == null) return "-";
-
-        return identity.branch() + " / " + identity.accountNumber();
     }
 }

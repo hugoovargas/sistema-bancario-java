@@ -5,19 +5,19 @@ import model.Transaction;
 import java.util.*;
 
 public class TransactionRepository {
-    private final Map<UUID, List<Transaction>> transactions;
+    private final Map<UUID, List<Transaction>> transactionsByAccountId;
 
     public TransactionRepository() {
-        this.transactions = new HashMap<>();
+        this.transactionsByAccountId = new HashMap<>();
     }
 
-    public void save(UUID account, Transaction transaction){
-        transactions
-                .computeIfAbsent(account, k -> new ArrayList<>())
+    public void save(UUID accountId, Transaction transaction){
+        transactionsByAccountId
+                .computeIfAbsent(accountId, k -> new ArrayList<>())
                 .add(transaction);
     }
 
-    public List<Transaction> getTransactionsByAccountId(UUID id){
-        return Collections.unmodifiableList(transactions.getOrDefault(id, Collections.emptyList()));
+    public List<Transaction> getTransactionsByAccountId(UUID accountId){
+        return Collections.unmodifiableList(transactionsByAccountId.getOrDefault(accountId, Collections.emptyList()));
     }
 }

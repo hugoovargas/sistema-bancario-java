@@ -1,14 +1,15 @@
 package UI;
 
+import UI.error.ErrorHandler;
 import UI.menu.AccountMenu;
 import UI.menu.ClientMenu;
 import UI.menu.InitialMenu;
 import exception.*;
 import model.AccountType;
-import model.valueObjects.AccountIdentity;
-import model.valueObjects.Cpf;
-import model.valueObjects.Email;
-import model.valueObjects.PersonName;
+import model.valueobject.AccountIdentity;
+import model.valueobject.Cpf;
+import model.valueobject.Email;
+import model.valueobject.PersonName;
 import service.ApplicationService;
 import service.dto.ClientData;
 
@@ -72,11 +73,8 @@ public class App {
 
             enterClientMenu();
 
-        } catch (ClientNotFoundException e) {
-
-            System.out.println(
-                    "Erro: " + e.getMessage()
-            );
+        } catch (DomainException e) {
+            ErrorHandler.printError(e);
         }
     }
 
@@ -116,14 +114,8 @@ public class App {
 
             enterClientMenu();
 
-        } catch (
-                CpfAlreadyExistsException |
-                EmailAlreadyExistsException e
-        ) {
-
-            System.out.println(
-                    "Erro: " + e.getMessage()
-            );
+        } catch (DomainException e) {
+            ErrorHandler.printError(e);
         }
     }
 
@@ -278,10 +270,8 @@ public class App {
 
             System.out.println(account);
 
-        } catch (InvalidAccountTypeException |
-                 AccountDeletionNotAllowedException |
-                 AccountNotFoundException e) {
-            System.out.println("Erro: " + e.getMessage());
+        } catch (DomainException e) {
+            ErrorHandler.printError(e);
         }
     }
 
@@ -326,10 +316,8 @@ public class App {
                     "Conta removida com sucesso!"
             );
 
-        } catch (InvalidAccountTypeException |
-                 AccountDeletionNotAllowedException |
-                 AccountNotFoundException e) {
-            System.out.println("Erro: " + e.getMessage());
+        } catch (DomainException e) {
+            ErrorHandler.printError(e);
         }
     }
 
@@ -347,13 +335,8 @@ public class App {
 
             loggedCpf = null;
 
-        } catch (
-                AccountDeletionNotAllowedException e
-        ) {
-
-            System.out.println(
-                    "Erro: " + e.getMessage()
-            );
+        } catch (DomainException e) {
+            ErrorHandler.printError(e);
         }
     }
 

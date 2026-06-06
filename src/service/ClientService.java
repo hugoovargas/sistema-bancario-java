@@ -4,9 +4,9 @@ import exception.ClientNotFoundException;
 import exception.CpfAlreadyExistsException;
 import exception.EmailAlreadyExistsException;
 import model.Client;
-import model.valueObjects.Cpf;
-import model.valueObjects.Email;
-import model.valueObjects.PersonName;
+import model.valueobject.Cpf;
+import model.valueobject.Email;
+import model.valueobject.PersonName;
 import repository.ClientRepository;
 
 public class ClientService {
@@ -17,7 +17,7 @@ public class ClientService {
         this.clientRepository = clientRepository;
     }
 
-    public void save(
+    public void createClient(
             PersonName name,
             Cpf cpf,
             Email email

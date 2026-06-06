@@ -1,8 +1,7 @@
-package model.valueObjects;
+package model.valueobject;
 
 import exception.InvalidEmailException;
 
-import java.util.Objects;
 import java.util.regex.Pattern;
 
 public record Email(String value) {
@@ -12,7 +11,9 @@ public record Email(String value) {
 
     public Email {
 
-        Objects.requireNonNull(value, "Email não pode ser null");
+        if (value == null) {
+            throw new InvalidEmailException("Email não pode ser null");
+        }
 
         value = value
                 .trim()

@@ -1,14 +1,14 @@
-package model.valueObjects;
+package model.valueobject;
 
 import exception.InvalidCpfException;
-
-import java.util.Objects;
 
 public record Cpf(String value) {
 
     public Cpf {
 
-        Objects.requireNonNull(value, "CPF não pode ser null");
+        if (value == null) {
+            throw new InvalidCpfException("CPF não pode ser null");
+        }
 
         value = value.replaceAll("[^0-9]", "");
 
@@ -24,8 +24,6 @@ public record Cpf(String value) {
     }
 
     private static boolean isValidCpf(String cpf) {
-
-        if (cpf.isBlank()) return false;
 
         if (cpf.length() != 11) return false;
 

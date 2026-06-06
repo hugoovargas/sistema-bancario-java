@@ -1,12 +1,13 @@
 package UI.menu;
 
 import UI.InputReader;
-import exception.*;
-import model.Transaction;
-import model.valueObjects.AccountIdentity;
-import model.valueObjects.Cpf;
-import model.valueObjects.Money;
+import UI.error.ErrorHandler;
+import exception.DomainException;
+import model.valueobject.AccountIdentity;
+import model.valueobject.Cpf;
+import model.valueobject.Money;
 import service.ApplicationService;
+import service.dto.StatementData;
 
 import java.util.List;
 import java.util.Scanner;
@@ -148,14 +149,8 @@ public class AccountMenu {
                     "Depósito realizado!"
             );
 
-        } catch (
-                InvalidAmountException |
-                AccountNotFoundException e
-        ) {
-
-            System.out.println(
-                    "Erro: " + e.getMessage()
-            );
+        } catch (DomainException e) {
+            ErrorHandler.printError(e);
         }
     }
 
@@ -183,14 +178,9 @@ public class AccountMenu {
             );
 
         } catch (
-                InvalidAmountException |
-                InsufficientBalanceException |
-                AccountNotFoundException e
+                DomainException e
         ) {
-
-            System.out.println(
-                    "Erro: " + e.getMessage()
-            );
+            ErrorHandler.printError(e);
         }
     }
 
@@ -207,11 +197,8 @@ public class AccountMenu {
                             .getAccountBalance(account)
             );
 
-        } catch (AccountNotFoundException e) {
-
-            System.out.println(
-                    "Erro: " + e.getMessage()
-            );
+        } catch (DomainException e) {
+            ErrorHandler.printError(e);
         }
     }
 
@@ -259,17 +246,8 @@ public class AccountMenu {
                     "Transferência realizada!"
             );
 
-        } catch (
-                InvalidAmountException |
-                InvalidTransferException |
-                InsufficientBalanceException |
-                AccountNotFoundException |
-                ValidationException e
-        ) {
-
-            System.out.println(
-                    "Erro: " + e.getMessage()
-            );
+        } catch (DomainException e) {
+            ErrorHandler.printError(e);
         }
     }
 
@@ -280,7 +258,7 @@ public class AccountMenu {
 
         try {
 
-            List<Transaction> transactions =
+            List<StatementData> transactions =
                     applicationService
                             .getAccountTransactions(
                                     account
@@ -295,17 +273,14 @@ public class AccountMenu {
                 return;
             }
 
-            for (Transaction transaction
+            for (StatementData transaction
                     : transactions) {
 
                 System.out.println(transaction);
             }
 
-        } catch (AccountNotFoundException e) {
-
-            System.out.println(
-                    "Erro: " + e.getMessage()
-            );
+        } catch (DomainException e) {
+            ErrorHandler.printError(e);
         }
     }
 }

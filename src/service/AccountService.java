@@ -5,9 +5,9 @@ import exception.AccountNotFoundException;
 import exception.InvalidAccountTypeException;
 import generator.AccountIdentityGenerator;
 import model.*;
-import model.valueObjects.AccountIdentity;
-import model.valueObjects.Cpf;
-import model.valueObjects.Money;
+import model.valueobject.AccountIdentity;
+import model.valueobject.Cpf;
+import model.valueobject.Money;
 import repository.AccountRepository;
 
 import java.time.Clock;
@@ -30,7 +30,7 @@ public class AccountService {
     }
 
 
-    public AccountIdentity save(Cpf cpf, AccountType type) {
+    public AccountIdentity createAccount(Cpf cpf, AccountType type) {
 
         Client client = clientService.getClientByCpf(cpf);
 
@@ -41,7 +41,7 @@ public class AccountService {
 
             accountIdentity = AccountIdentityGenerator.generate();
 
-        } while (accountRepository.exists(accountIdentity));
+        } while (accountRepository.existsByAccountIdentity(accountIdentity));
 
         switch (type){
             case CHECKING -> account = new CheckingAccount(client.getId(), accountIdentity, clock);

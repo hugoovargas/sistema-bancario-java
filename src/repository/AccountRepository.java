@@ -1,7 +1,7 @@
 package repository;
 
 import model.Account;
-import model.valueObjects.AccountIdentity;
+import model.valueobject.AccountIdentity;
 
 import java.util.*;
 
@@ -14,7 +14,7 @@ public class AccountRepository {
         this.accountIndex = new HashMap<>();
     }
 
-    public boolean exists(AccountIdentity accountIdentity) {
+    public boolean existsByAccountIdentity(AccountIdentity accountIdentity) {
         return accountIndex.containsKey(accountIdentity);
     }
 
@@ -33,15 +33,18 @@ public class AccountRepository {
                 .toList();
     }
 
-    public Optional<Account> findById(UUID id){
-        return Optional.ofNullable(accounts.get(id));
+    public Optional<Account> findById(UUID accountId){
+        return Optional.ofNullable(accounts.get(accountId));
     }
 
     public Optional<Account> findByAccountIdentity(AccountIdentity accountIdentity){
-        if(!exists(accountIdentity)) return Optional.empty();
+        UUID accountId = accountIndex.get(accountIdentity);
 
-        UUID uuid = accountIndex.get(accountIdentity);
-        return findById(uuid);
+        if (accountId == null) {
+            return Optional.empty();
+        }
+
+        return findById(accountId);
     }
 
     public void removeAccount(UUID accountId){
@@ -50,22 +53,15 @@ public class AccountRepository {
     }
 
     public void removeClientAccounts(UUID clientId) {
-        Set<UUID> removedAccountIds = new HashSet<>();
+        List<Account> accountsToRemove =
+                accounts.values()
+                        .stream()
+                        .filter(a -> a.getClientId().equals(clientId))
+                        .toList();
 
-        accounts.entrySet()
-                .removeIf(entry -> {
-
-                    boolean remove =
-                            entry.getValue().getClientId().equals(clientId);
-
-                    if (remove) {
-                        removedAccountIds.add(entry.getKey());
-                    }
-
-                    return remove;
-                });
-
-        accountIndex.entrySet().removeIf(entry ->
-                removedAccountIds.contains(entry.getValue()));
+        accountsToRemove.forEach(account -> {
+            accounts.remove(account.getId());
+            accountIndex.remove(account.getAccountIdentity());
+        });
     }
 }

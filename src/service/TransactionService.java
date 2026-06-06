@@ -4,9 +4,10 @@ import exception.InvalidTransferException;
 import model.Account;
 import model.Transaction;
 import model.TransactionType;
-import model.valueObjects.AccountIdentity;
-import model.valueObjects.Money;
+import model.valueobject.AccountIdentity;
+import model.valueobject.Money;
 import repository.TransactionRepository;
+import service.dto.StatementData;
 
 import java.time.Clock;
 import java.util.List;
@@ -15,15 +16,16 @@ import java.util.UUID;
 public class TransactionService {
     private final AccountService accountService;
     private final TransactionRepository transactionRepository;
+    private final Clock clock;
 
-    public TransactionService(AccountService accountService, TransactionRepository transactionRepository) {
+    public TransactionService(AccountService accountService, TransactionRepository transactionRepository, Clock clock) {
         this.accountService = accountService;
         this.transactionRepository = transactionRepository;
+        this.clock = clock;
     }
 
-
     public void deposit(AccountIdentity id,
-                        Money value, Clock clock) {
+                        Money value) {
 
 
         Account account = accountService.getAccountByAccountIdentity(id);
@@ -34,7 +36,7 @@ public class TransactionService {
 
 
     public void withdraw(AccountIdentity id,
-                         Money value, Clock clock) {
+                         Money value) {
 
         Account account = accountService.getAccountByAccountIdentity(id);
         account.withdraw(value);
@@ -45,7 +47,7 @@ public class TransactionService {
 
     public void transfer(AccountIdentity fromId,
                          AccountIdentity toId,
-                         Money value, Clock clock) {
+                         Money value) {
 
 
         Account from = accountService.getAccountByAccountIdentity(fromId);
@@ -58,14 +60,24 @@ public class TransactionService {
         from.withdraw(value);
         to.deposit(value);
         transactionRepository.save(from.getId(), new Transaction(TransactionType.TRANSFER_SENT, value,
-                from.getAccountIdentity(), null, clock));
+                from.getAccountIdentity(), to.getAccountIdentity(), clock));
 
         transactionRepository.save(to.getId(), new Transaction(TransactionType.TRANSFER_RECEIVED, value,
-                to.getAccountIdentity(), null, clock));
+                from.getAccountIdentity(), to.getAccountIdentity(), clock));
 
     }
 
-    public List<Transaction> getTransactionHistory(UUID account) {
-        return transactionRepository.getTransactionsByAccountId(account);
+    public List<StatementData> getTransactionHistory(UUID accountId) {
+        List<Transaction> transactionsByAccountId = transactionRepository.getTransactionsByAccountId(accountId);
+
+        return transactionsByAccountId.stream()
+                .map(t -> new StatementData(
+                        t.getType(),
+                        t.getDateTime(),
+                        t.getSourceId(),
+                        t.getDestinationId(),
+                        t.getAmount(),
+                        t.getId()
+                )).toList();
     }
 }

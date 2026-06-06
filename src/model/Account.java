@@ -2,8 +2,8 @@ package model;
 
 import exception.InvalidAmountException;
 import exception.InsufficientBalanceException;
-import model.valueObjects.AccountIdentity;
-import model.valueObjects.Money;
+import model.valueobject.AccountIdentity;
+import model.valueobject.Money;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
@@ -66,7 +66,7 @@ public abstract class Account {
 
     private void validatePositiveAmount(Money amount) {
 
-        if (amount.isNegativeOrZero()) {
+        if (amount == null || amount.isNegativeOrZero()) {
             throw new InvalidAmountException(
                     "Valor inválido"
             );

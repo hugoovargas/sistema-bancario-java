@@ -1,6 +1,6 @@
 package generator;
 
-import model.valueObjects.AccountIdentity;
+import model.valueobject.AccountIdentity;
 
 import java.util.concurrent.ThreadLocalRandom;
 

@@ -1,7 +1,7 @@
 package model;
 
-import model.valueObjects.AccountIdentity;
-import model.valueObjects.Money;
+import model.valueobject.AccountIdentity;
+import model.valueobject.Money;
 
 import java.math.BigDecimal;
 import java.time.Clock;
@@ -12,8 +12,6 @@ public class SavingsAccount extends Account {
 
     private static final BigDecimal INTEREST_RATE =
             new BigDecimal("0.005");
-
-    private final Clock clock;
 
     private LocalDateTime lastInterestApply;
 
@@ -29,7 +27,6 @@ public class SavingsAccount extends Account {
                 clock
         );
 
-        this.clock = clock;
         this.lastInterestApply = getCreationTime();
     }
 
@@ -38,16 +35,20 @@ public class SavingsAccount extends Account {
         return Money.ZERO;
     }
 
-    public boolean isTimeToApplyInterest() {
+    public boolean isTimeToApplyInterest(Clock clock) {
 
         return !lastInterestApply
                 .plusMonths(1)
                 .isAfter(LocalDateTime.now(clock));
     }
 
-    public boolean applyInterest() {
+    public boolean applyInterest(Clock clock) {
 
-        if (!isTimeToApplyInterest()) {
+        if (!isTimeToApplyInterest(clock)) {
+            return false;
+        }
+
+        if (getBalance().isZero()) {
             return false;
         }
 

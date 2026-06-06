@@ -1,5 +1,6 @@
-package model.valueObjects;
+package model.valueobject;
 
+import exception.InvalidAmountException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.NumberFormat;
@@ -10,13 +11,19 @@ public record Money(BigDecimal value) implements Comparable<Money>{
     public static final Money ZERO = new Money(BigDecimal.ZERO);
 
     public Money {
-        Objects.requireNonNull(value, "Valor não pode ser null");
+        if (value == null) {
+            throw new InvalidAmountException("Valor não pode ser null");
+        }
 
         value = value.setScale(2, RoundingMode.HALF_UP);
     }
 
     public boolean isZero(){
         return value.compareTo(BigDecimal.ZERO) == 0;
+    }
+
+    public static Money of(String amount){
+        return new Money(new BigDecimal(amount));
     }
 
     public boolean isNegativeOrZero(){
