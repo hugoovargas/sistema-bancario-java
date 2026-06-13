@@ -77,4 +77,6 @@ class EmailTest {
                 () -> new Email("@gmail.com")
         );
     }
+
+
 }
