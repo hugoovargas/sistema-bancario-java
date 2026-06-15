@@ -1,4 +1,4 @@
-package test.valueobject;
+package valueobject;
 
 import exception.InvalidEmailException;
 import model.valueobject.Email;

@@ -1,4 +1,4 @@
-package test.valueobject;
+package valueobject;
 
 import exception.InvalidAccountNumberException;
 import exception.InvalidBranchException;
