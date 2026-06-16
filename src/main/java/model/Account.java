@@ -7,6 +7,7 @@ import model.valueobject.Money;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.UUID;
 
 public abstract class Account {
@@ -66,7 +67,9 @@ public abstract class Account {
 
     private void validatePositiveAmount(Money amount) {
 
-        if (amount == null || amount.isNegativeOrZero()) {
+        Objects.requireNonNull(amount, "Valor não pode ser nulo");
+
+        if (amount.isNegativeOrZero()) {
             throw new InvalidAmountException(
                     "Valor inválido"
             );

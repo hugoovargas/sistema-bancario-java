@@ -10,7 +10,8 @@ import model.valueobject.PersonName;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import repository.ClientRepository;
-import service.ClientService;
+
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -147,9 +148,17 @@ public class ClientServiceTest {
     void shouldDeleteClient() {
 
         Client client = createClient();
-        clientService.createClient(client.getName(), client.getCpf(), client.getEmail());
 
-        clientService.delete(client.getCpf());
+        clientService.createClient(
+                client.getName(),
+                client.getCpf(),
+                client.getEmail()
+        );
+
+        Client saved =
+                clientService.getClientByCpf(client.getCpf());
+
+        clientService.delete(saved.getId());
 
         assertThrows(
                 ClientNotFoundException.class,
@@ -160,10 +169,12 @@ public class ClientServiceTest {
     @Test
     void shouldThrowExceptionWhenDeletingNonexistentClient() {
 
+        UUID nonExistentId = UUID.randomUUID();
+
         assertThrows(
                 ClientNotFoundException.class,
                 () -> clientService.delete(
-                        new Cpf("52998224725")
+                        nonExistentId
                 )
         );
     }

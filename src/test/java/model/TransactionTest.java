@@ -1,7 +1,5 @@
 package model;
 
-import model.Transaction;
-import model.TransactionType;
 import model.valueobject.AccountIdentity;
 import model.valueobject.Money;
 import org.junit.jupiter.api.Test;
@@ -10,6 +8,7 @@ import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -95,8 +94,11 @@ public class TransactionTest {
                         "999999-9"
                 );
 
+        UUID operationId = UUID.randomUUID();
+
         Transaction transaction =
                 Transaction.transferSent(
+                        operationId,
                         from,
                         to,
                         Money.of("100"),

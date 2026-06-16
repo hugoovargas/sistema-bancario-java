@@ -1,6 +1,5 @@
 package model;
 
-import exception.InvalidClientChangeException;
 import model.valueobject.Cpf;
 import model.valueobject.Email;
 import model.valueobject.PersonName;
@@ -40,16 +39,10 @@ public class Client {
     }
 
     public void changeName(PersonName newName) {
-        if(this.name.equals(newName)) throw new InvalidClientChangeException("Novo nome é igual ao nome atual");
-        if(newName == null) throw new InvalidClientChangeException("Nome não pode ser null");
-
         this.name = newName;
     }
 
     public void changeEmail(Email newEmail) {
-        if(this.email.equals(newEmail)) throw new InvalidClientChangeException("Novo email é igual ao email atual");
-        if(newEmail == null) throw new InvalidClientChangeException("Email não pode ser null");
-
         this.email = newEmail;
     }
 }

@@ -1,12 +1,12 @@
 package valueobject;
 
+import exception.InvalidAmountException;
 import model.valueobject.Money;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class MoneyTest {
 
@@ -186,5 +186,11 @@ class MoneyTest {
         );
     }
 
-
+    @Test
+    void shouldThrowExceptionIfValueIsNotANumber() {
+        assertThrows(
+                InvalidAmountException.class,
+                () -> Money.of("A%[]!()")
+        );
+    }
 }

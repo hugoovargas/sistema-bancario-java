@@ -5,13 +5,12 @@ import exception.AccountNotFoundException;
 import exception.ClientNotFoundException;
 import model.Account;
 import model.AccountType;
+import model.Client;
 import model.valueobject.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import repository.AccountRepository;
 import repository.ClientRepository;
-import service.AccountService;
-import service.ClientService;
 
 import java.time.Clock;
 import java.util.List;
@@ -160,6 +159,8 @@ public class AccountServiceTest {
                 new Email("hugo@gmail.com")
         );
 
+        Client client = clientService.getClientByCpf(cpf);
+
         accountService.createAccount(
                 cpf,
                 AccountType.CHECKING
@@ -171,7 +172,7 @@ public class AccountServiceTest {
         );
 
         List<AccountIdentity> accounts =
-                accountService.getClientAccountsIdentity(cpf);
+                accountService.getClientAccountsIdentity(client.getId());
 
         assertEquals(2, accounts.size());
     }
@@ -197,6 +198,8 @@ public class AccountServiceTest {
                 new Email("ana@gmail.com")
         );
 
+        Client client = clientService.getClientByCpf(cpf1);
+
         AccountIdentity account1 =
                 accountService.createAccount(
                         cpf1,
@@ -209,7 +212,7 @@ public class AccountServiceTest {
         );
 
         List<AccountIdentity> accounts =
-                accountService.getClientAccountsIdentity(cpf1);
+                accountService.getClientAccountsIdentity(client.getId());
 
         assertEquals(1, accounts.size());
 
@@ -261,8 +264,11 @@ public class AccountServiceTest {
                 new Email("hugo@gmail.com")
         );
 
+        Client client = clientService.getClientByCpf(cpf);
+
+
         List<AccountIdentity> accounts =
-                accountService.getClientAccountsIdentity(cpf);
+                accountService.getClientAccountsIdentity(client.getId());
 
         assertTrue(accounts.isEmpty());
     }

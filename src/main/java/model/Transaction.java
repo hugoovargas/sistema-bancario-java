@@ -11,13 +11,15 @@ import java.util.UUID;
 
 public class Transaction {
     private final UUID id;
+    private final UUID operationId;
     private final TransactionType type;
     private final Money amount;
     private final AccountIdentity sourceIdentity;
     private final AccountIdentity destinationIdentity;
     private final LocalDateTime dateTime;
 
-    private Transaction(TransactionType type,
+    private Transaction(UUID operationId,
+                        TransactionType type,
                         Money amount,
                         AccountIdentity sourceIdentity,
                         AccountIdentity destinationIdentity, Clock clock) {
@@ -27,6 +29,7 @@ public class Transaction {
         Objects.requireNonNull(clock); //ver questão de NullException
 
         this.id = UUID.randomUUID();
+        this.operationId = operationId;
         this.type = type;
         this.amount = amount;
         this.dateTime = LocalDateTime.now(clock);
@@ -36,34 +39,29 @@ public class Transaction {
         validateState();
     }
 
-    public static Transaction deposit(AccountIdentity accountIdentity,
-                                      Money amount,
-                                      Clock clock) {
-        return new Transaction(TransactionType.DEPOSIT, amount, null, accountIdentity, clock);
+    private void validateState() {
+        //validação defensiva
+
+        switch (type) {
+
+            case DEPOSIT -> validateDeposit();
+
+            case WITHDRAW -> validateWithdraw();
+
+            case TRANSFER_SENT, TRANSFER_RECEIVED -> validateTransfer();
+        }
     }
 
-    public static Transaction withdraw(AccountIdentity accountIdentity,
-                                       Money amount,
-                                       Clock clock) {
-        return new Transaction(TransactionType.WITHDRAW, amount, accountIdentity, null, clock);
-    }
 
-    public static Transaction transferSent(AccountIdentity from,
-                                           AccountIdentity to,
-                                           Money amount,
-                                           Clock clock) {
-        return new Transaction(TransactionType.TRANSFER_SENT, amount, from, to, clock);
-    }
-
-    public static Transaction transferReceived(AccountIdentity from,
-                                               AccountIdentity to,
-                                               Money amount,
-                                               Clock clock) {
-        return new Transaction(TransactionType.TRANSFER_RECEIVED, amount, from, to, clock);
-    }
-
+    // =========================
+    // Getters
+    // =========================
     public UUID getId() {
         return id;
+    }
+
+    public UUID getOperationId() {
+        return operationId;
     }
 
     public TransactionType getType() {
@@ -86,27 +84,60 @@ public class Transaction {
         return destinationIdentity;
     }
 
-    private void validateState() {
+    // =========================
+    // Helpers
+    // =========================
 
-        switch (type) {
-
-            case DEPOSIT -> {
-                if (sourceIdentity != null || destinationIdentity == null) {
-                    throw new InvalidTransactionException("Transação inválida");
-                }
-            }
-
-            case WITHDRAW -> {
-                if (sourceIdentity == null || destinationIdentity != null) {
-                    throw new InvalidTransactionException("Transação inválida");
-                }
-            }
-
-            case TRANSFER_SENT, TRANSFER_RECEIVED -> {
-                if (sourceIdentity == null || destinationIdentity == null) {
-                    throw new InvalidTransactionException("Transação inválida");
-                }
-            }
+    private void validateDeposit() {
+        if (sourceIdentity != null || destinationIdentity == null) {
+            throw new InvalidTransactionException("DEPÓSITO não deve possuir conta de origem");
         }
+    }
+
+    private void validateWithdraw() {
+        if (sourceIdentity == null || destinationIdentity != null) {
+            throw new InvalidTransactionException("SAQUE não deve possuir conta de destino");
+        }
+    }
+
+    private void validateTransfer() {
+        if (operationId == null){
+            throw new InvalidTransactionException("Toda transferência deve possuir um ID de operação");
+        }
+        if (sourceIdentity == null || destinationIdentity == null) {
+            throw new InvalidTransactionException("Transferência não deve possuir origem e/ou destino nulls");
+        }
+    }
+
+    // =========================
+    // Factory Methods
+    // =========================
+
+    public static Transaction deposit(AccountIdentity accountIdentity,
+                                      Money amount,
+                                      Clock clock) {
+        return new Transaction(null, TransactionType.DEPOSIT, amount, null, accountIdentity, clock);
+    }
+
+    public static Transaction withdraw(AccountIdentity accountIdentity,
+                                       Money amount,
+                                       Clock clock) {
+        return new Transaction(null, TransactionType.WITHDRAW, amount, accountIdentity, null, clock);
+    }
+
+    public static Transaction transferSent(UUID operationId,
+                                           AccountIdentity from,
+                                           AccountIdentity to,
+                                           Money amount,
+                                           Clock clock) {
+        return new Transaction(operationId, TransactionType.TRANSFER_SENT, amount, from, to, clock);
+    }
+
+    public static Transaction transferReceived(UUID operationId,
+                                               AccountIdentity from,
+                                               AccountIdentity to,
+                                               Money amount,
+                                               Clock clock) {
+        return new Transaction(operationId, TransactionType.TRANSFER_RECEIVED, amount, from, to, clock);
     }
 }

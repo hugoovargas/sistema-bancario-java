@@ -2,7 +2,6 @@ package model;
 
 import exception.InsufficientBalanceException;
 import exception.InvalidAmountException;
-import model.CheckingAccount;
 import model.valueobject.AccountIdentity;
 import model.valueobject.Money;
 import org.junit.jupiter.api.Test;
