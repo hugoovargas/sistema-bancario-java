@@ -47,6 +47,14 @@ public class Client {
         this.email = newEmail;
     }
 
+    public boolean hasSameName(PersonName newName) {
+        return this.name.equals(newName);
+    }
+
+    public boolean hasSameEmail(Email newEmail) {
+        return this.email.equals(newEmail);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
