@@ -1,15 +1,13 @@
-package generator;
-
-import model.valueobject.AccountIdentity;
+package model.valueobject;
 
 import java.util.concurrent.ThreadLocalRandom;
 
-public final class AccountIdentityGenerator {
+public final class AccountIdentityFactory {
 
     private static final int MAX_ACCOUNT_NUMBER = 1_000_000;
     private static final int MAX_BRANCH_NUMBER = 50;
 
-    private AccountIdentityGenerator() {
+    private AccountIdentityFactory() {
     }
 
     private static String generateBranch() {
