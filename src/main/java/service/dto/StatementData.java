@@ -53,5 +53,4 @@ public record StatementData(
 
         return operationId.toString();
     }
-
 }

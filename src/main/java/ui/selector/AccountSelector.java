@@ -1,7 +1,7 @@
-package UI.selector;
+package ui.selector;
 
-import UI.InputReader;
-import UI.messages.ConsoleMessages;
+import ui.InputReader;
+import ui.messages.ConsoleMessages;
 import exception.NoAccountsFoundException;
 import model.valueobject.AccountIdentity;
 

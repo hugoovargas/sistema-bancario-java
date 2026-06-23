@@ -45,8 +45,45 @@ public class Transaction {
         this.dateTime = LocalDateTime.now(clock);
     }
 
+
     // =========================
-    // Helpers
+    // Factory Methods
+    // =========================
+
+    public static Transaction deposit(AccountIdentity accountIdentity,
+                                      Money amount,
+                                      Clock clock) {
+        return new Transaction(null, TransactionType.DEPOSIT, amount, null, accountIdentity, clock);
+    }
+
+    public static Transaction withdraw(AccountIdentity accountIdentity,
+                                       Money amount,
+                                       Clock clock) {
+        return new Transaction(null, TransactionType.WITHDRAW, amount, accountIdentity, null, clock);
+    }
+
+    public static Transaction transferSent(UUID operationId,
+                                           AccountIdentity from,
+                                           AccountIdentity to,
+                                           Money amount,
+                                           Clock clock) {
+        return new Transaction(operationId, TransactionType.TRANSFER_SENT, amount, from, to, clock);
+    }
+
+    public static Transaction transferReceived(UUID operationId,
+                                               AccountIdentity from,
+                                               AccountIdentity to,
+                                               Money amount,
+                                               Clock clock) {
+        return new Transaction(operationId, TransactionType.TRANSFER_RECEIVED, amount, from, to, clock);
+    }
+
+    public static Transaction interest(AccountIdentity accountIdentity, Money amount, Clock clock) {
+        return new Transaction(null, TransactionType.INTEREST, amount, null, accountIdentity, clock);
+    }
+
+    // =========================
+    // Validators
     // =========================
 
     private static void validateState(UUID operationId,
@@ -125,6 +162,7 @@ public class Transaction {
     // =========================
     // Getters
     // =========================
+
     public UUID getId() {
         return id;
     }
@@ -155,40 +193,8 @@ public class Transaction {
 
 
     // =========================
-    // Factory Methods
+    // Equals e Hashcode
     // =========================
-
-    public static Transaction deposit(AccountIdentity accountIdentity,
-                                      Money amount,
-                                      Clock clock) {
-        return new Transaction(null, TransactionType.DEPOSIT, amount, null, accountIdentity, clock);
-    }
-
-    public static Transaction withdraw(AccountIdentity accountIdentity,
-                                       Money amount,
-                                       Clock clock) {
-        return new Transaction(null, TransactionType.WITHDRAW, amount, accountIdentity, null, clock);
-    }
-
-    public static Transaction transferSent(UUID operationId,
-                                           AccountIdentity from,
-                                           AccountIdentity to,
-                                           Money amount,
-                                           Clock clock) {
-        return new Transaction(operationId, TransactionType.TRANSFER_SENT, amount, from, to, clock);
-    }
-
-    public static Transaction transferReceived(UUID operationId,
-                                               AccountIdentity from,
-                                               AccountIdentity to,
-                                               Money amount,
-                                               Clock clock) {
-        return new Transaction(operationId, TransactionType.TRANSFER_RECEIVED, amount, from, to, clock);
-    }
-
-    public static Transaction interest(AccountIdentity accountIdentity, Money amount, Clock clock) {
-        return new Transaction(null, TransactionType.INTEREST, amount, null, accountIdentity, clock);
-    }
 
     @Override
     public boolean equals(Object o) {

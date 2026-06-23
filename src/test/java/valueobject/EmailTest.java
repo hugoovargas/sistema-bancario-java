@@ -13,7 +13,7 @@ class EmailTest {
     void shouldCreateValidEmail() {
 
         Email email =
-                new Email("teste@gmail.com");
+                createEmail("teste@gmail.com");
 
         assertEquals(
                 "teste@gmail.com",
@@ -25,7 +25,7 @@ class EmailTest {
     void shouldNormalizeEmail() {
 
         Email email =
-                new Email("  TESTE@GMAIL.COM ");
+                createEmail("  TESTE@GMAIL.COM ");
 
         assertEquals(
                 "teste@gmail.com",
@@ -38,7 +38,7 @@ class EmailTest {
 
         assertThrows(
                 InvalidEmailException.class,
-                () -> new Email("teste.com")
+                () -> createEmail("teste.com")
         );
     }
 
@@ -47,7 +47,7 @@ class EmailTest {
 
         assertThrows(
                 InvalidEmailException.class,
-                () -> new Email(null)
+                () -> createEmail(null)
         );
     }
 
@@ -56,7 +56,7 @@ class EmailTest {
 
         assertThrows(
                 InvalidEmailException.class,
-                () -> new Email("")
+                () -> createEmail("")
         );
     }
 
@@ -65,7 +65,7 @@ class EmailTest {
 
         assertThrows(
                 InvalidEmailException.class,
-                () -> new Email("teste@")
+                () -> createEmail("teste@")
         );
     }
 
@@ -74,7 +74,7 @@ class EmailTest {
 
         assertThrows(
                 InvalidEmailException.class,
-                () -> new Email("@gmail.com")
+                () -> createEmail("@gmail.com")
         );
     }
 
@@ -83,7 +83,7 @@ class EmailTest {
 
         assertThrows(
                 InvalidEmailException.class,
-                () -> new Email("teste@@gmail.com")
+                () -> createEmail("teste@@gmail.com")
         );
     }
 
@@ -92,7 +92,7 @@ class EmailTest {
 
         assertThrows(
                 InvalidEmailException.class,
-                () -> new Email("teste@gmail")
+                () -> createEmail("teste@gmail")
         );
     }
 
@@ -100,10 +100,10 @@ class EmailTest {
     void shouldBeEqualAfterNormalization() {
 
         Email first =
-                new Email("TESTE@GMAIL.COM");
+                createEmail("TESTE@GMAIL.COM");
 
         Email second =
-                new Email("teste@gmail.com");
+                createEmail("teste@gmail.com");
 
         assertEquals(first, second);
     }
@@ -113,7 +113,11 @@ class EmailTest {
 
         assertThrows(
                 InvalidEmailException.class,
-                () -> new Email("tes te@gmail.com")
+                () -> createEmail("tes te@gmail.com")
         );
+    }
+
+    private Email createEmail(String email){
+        return new Email(email);
     }
 }

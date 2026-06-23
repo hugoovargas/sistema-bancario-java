@@ -43,6 +43,10 @@ public abstract class Account {
         this.balance = Money.ZERO;
     }
 
+    // =========================
+    // Actions
+    // =========================
+
     public void deposit(Money amount) {
 
         validatePositiveAmount(amount);
@@ -95,6 +99,11 @@ public abstract class Account {
         return balance.isZero();
     }
 
+
+    // =========================
+    // Getters
+    // =========================
+
     public UUID getId() {
         return id;
     }
@@ -114,6 +123,11 @@ public abstract class Account {
     public Money getBalance() {
         return balance;
     }
+
+
+    // =========================
+    // Equals e Hashcode
+    // =========================
 
     @Override
     public boolean equals(Object o) {

@@ -1,6 +1,6 @@
-package UI;
+package ui;
 
-import UI.messages.ConsoleMessages;
+import ui.messages.ConsoleMessages;
 import exception.ValidationException;
 import model.valueobject.Money;
 

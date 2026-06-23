@@ -1,11 +1,11 @@
-package UI.controller;
+package ui.controller;
 
-import UI.InputReader;
-import UI.messages.ConsoleMessages;
+import ui.InputReader;
+import ui.messages.ConsoleMessages;
 import exception.DomainException;
 import model.valueobject.AccountIdentity;
 import model.valueobject.Money;
-import service.ApplicationService;
+import application.ApplicationService;
 import service.dto.StatementData;
 
 import java.text.NumberFormat;
