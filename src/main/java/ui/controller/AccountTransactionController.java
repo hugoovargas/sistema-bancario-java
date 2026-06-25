@@ -160,8 +160,7 @@ public final class AccountTransactionController {
             for (StatementData transaction
                     : transactions) {
 
-                ConsoleMessages.highlight(
-                        StatementFormatter.format(transaction)
+                ConsoleMessages.highlight(                        StatementFormatter.format(transaction)
                 );
 
             }
