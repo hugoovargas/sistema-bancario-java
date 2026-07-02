@@ -48,21 +48,15 @@ public final class Money implements Comparable<Money>{
     }
 
     public boolean isZero(){
-        return value.compareTo(BigDecimal.ZERO) == 0;
+        return compareTo(Money.ZERO) == 0;
     }
 
     public boolean isNegativeOrZero(){
-        return value.compareTo(BigDecimal.ZERO) <= 0;
+        return compareTo(Money.ZERO) <= 0;
     }
 
     public boolean isGreaterThan(Money other){
-        validateNonNull(other);
-        return value.compareTo(other.value) > 0;
-    }
-
-    public boolean isEqual(Money other){
-        validateNonNull(other);
-        return value.compareTo(other.value) == 0;
+        return compareTo(other) > 0;
     }
 
     public Money add(Money other) {
@@ -95,12 +89,6 @@ public final class Money implements Comparable<Money>{
         return value.compareTo(other.value);
     }
 
-    private static void validateNonNull(Object obj){
-        if(obj == null){
-            throw new InvalidAmountException("Valor não pode ser null");
-        }
-    }
-
     // =========================
     // Equals/Hashcode
     // =========================
@@ -118,5 +106,15 @@ public final class Money implements Comparable<Money>{
     @Override
     public int hashCode() {
         return value.stripTrailingZeros().hashCode();
+    }
+
+    // =========================
+    // Helper
+    // =========================
+
+    private static void validateNonNull(Object obj){
+        if(obj == null){
+            throw new InvalidAmountException("Valor não pode ser null");
+        }
     }
 }

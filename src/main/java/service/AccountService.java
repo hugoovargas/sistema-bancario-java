@@ -27,6 +27,9 @@ public class AccountService {
         this.clock = clock;
     }
 
+    // =========================
+    // Create
+    // =========================
 
     public AccountIdentity createAccount(UUID clientId, AccountType type) {
 
@@ -36,9 +39,9 @@ public class AccountService {
 
             accountIdentity = AccountIdentityFactory.generate();
 
-        } while (accountRepository.existsByAccountIdentity(accountIdentity));
+        } while (accountRepository.existsByAccountIdentity(accountIdentity)); // garante unicidade do AccountIdentity
 
-        Account account =
+        final Account account =
                 switch (type) {
                     case CHECKING ->
                             new CheckingAccount(
@@ -81,7 +84,7 @@ public class AccountService {
     }
 
     // =========================
-    // RemoveActions
+    // Delete
     // =========================
 
     public void removeClientAccounts(UUID clientId) {
@@ -101,10 +104,10 @@ public class AccountService {
     }
 
     // =========================
-    // Validate
+    // Validation
     // =========================
 
-    public void validateIfAccountsCanBeRemoved(UUID clientId) {
+    public void ensureClientAccountsCanBeRemoved(UUID clientId) {
 
         boolean hasNonZeroBalance =
                 accountRepository

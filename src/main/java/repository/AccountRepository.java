@@ -2,6 +2,7 @@ package repository;
 
 import model.Account;
 import model.valueobject.AccountIdentity;
+
 import java.util.*;
 
 public class AccountRepository {
@@ -14,6 +15,10 @@ public class AccountRepository {
         this.accountIndex = new HashMap<>();
         this.accountIdByClientId = new HashMap<>();
     }
+
+    // =========================
+    // Save
+    // =========================
 
     public void save(UUID clientId, Account account){
 
@@ -51,7 +56,7 @@ public class AccountRepository {
     }
 
     // =========================
-    // exists
+    // Exists
     // =========================
 
     public boolean existsByAccountIdentity(AccountIdentity accountIdentity) {
@@ -73,7 +78,7 @@ public class AccountRepository {
     }
 
     // =========================
-    // RemoveActions
+    // Delete
     // =========================
 
     public void removeAccount(UUID accountId){
