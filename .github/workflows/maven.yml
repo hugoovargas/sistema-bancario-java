@@ -4,12 +4,13 @@ on:
   push:
     branches:
       - main
-      - master
 
   pull_request:
     branches:
       - main
-      - master
+
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -28,7 +29,24 @@ jobs:
           cache: maven
 
       - name: Build and run tests
-        run: mvn clean test
+        run: mvn clean verify
 
       - name: Generate JaCoCo report
         run: mvn jacoco:report
+
+      - name: Upload JaCoCo Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-report
+          path: target/site/jacoco/
+
+      - name: Generate JaCoCo Badges
+        uses: cicirello/jacoco-badge-generator@v2
+        with:
+          generate-branches-badge: true
+          badges-directory: badges
+
+      - name: Commit coverage badges
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: Update JaCoCo badges

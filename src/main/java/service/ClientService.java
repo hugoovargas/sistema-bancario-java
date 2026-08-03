@@ -15,7 +15,7 @@ public class ClientService {
     private final ClientRepository clientRepository;
 
     private static final String CLIENT_NOT_FOUND =
-            "Cliente não encontrado";;
+            "Cliente não encontrado";
 
     public ClientService(ClientRepository clientRepository) {
         this.clientRepository = clientRepository;

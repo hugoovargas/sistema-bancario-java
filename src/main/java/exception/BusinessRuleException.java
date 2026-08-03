@@ -1,6 +1,6 @@
 package exception;
 
-public class BusinessRuleException extends DomainException{
+public abstract class BusinessRuleException extends DomainException{
     public BusinessRuleException(String message) {
         super(message);
     }
