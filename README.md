@@ -1,0 +1,506 @@
+# Banco Digital Java (BankLite)
+
+![Build](https://github.com/hugoovargas/sistema-bancario-java/actions/workflows/maven.yml/badge.svg)
+![Coverage](badges/jacoco.svg)
+![Branches](badges/branches.svg)
+
+# Visão Geral
+
+Sistema bancário desenvolvido em Java com foco em modelagem rica de domínio, arquitetura em camadas e testes automatizados.
+
+O projeto implementa operações bancárias reais utilizando conceitos de Domain-Driven Design (DDD), Rich Domain Model, Value Objects e boas práticas de orientação a objetos.
+
+## Destaques
+
+- Java 21
+- Rich Domain Model
+- Domain-Driven Design (DDD) — abordagem simplificada
+- Arquitetura em Camadas
+- CI com GitHub Actions
+- Cobertura de código com JaCoCo
+- Aplicação preguiçosa de juros (Lazy Interest Application)
+
+## Objetivos do Projeto
+
+O projeto foi desenvolvido para consolidar conhecimentos em modelagem de domínio, arquitetura de software e desenvolvimento backend utilizando Java, com foco na implementação de regras de negócio, testabilidade e organização em camadas.
+
+---
+
+# Principais Conceitos Aplicados
+
+## Arquitetura e Design
+
+* Programação Orientada a Objetos (POO)
+* Domain-Driven Design (DDD) — abordagem simplificada
+* Arquitetura em Camadas
+* Modelo de Domínio Rico
+* Princípios SOLID (com destaque para SRP e LSP)
+* Separação de Responsabilidades
+
+## Modelagem de Domínio
+
+* Entidades
+* Value Objects
+* Exceções de Domínio
+* Encapsulamento de Regras de Negócio
+* Imutabilidade
+* Lazy Interest Application
+
+## Comunicação entre Camadas
+
+* DTOs imutáveis utilizando Java Records
+
+## Padrões Utilizados
+
+* Repository Pattern
+* Service Layer Pattern
+* Facade Pattern (ApplicationService)
+* Template Method (Account)
+* Factory Method (Transaction)
+* Repositórios em Memória
+
+## Qualidade de Código
+
+* Testes Unitários com JUnit 5
+* Refatoração
+* Programação Defensiva
+* Validações Explícitas
+* Testabilidade
+* Controle Determinístico do Tempo (Clock)
+
+## Tecnologias e Ferramentas
+
+* Java 21
+* Maven
+* JaCoCo
+* GitHub Actions
+* Git
+
+---
+
+# Funcionalidades
+
+## Clientes
+
+* Cadastro de clientes;
+* Consulta dos dados cadastrais do cliente;
+* Alteração de nome;
+* Alteração de e-mail;
+* Remoção de clientes.
+
+## Contas
+
+* Criação de contas correntes;
+* Criação de contas poupança;
+* Consulta das contas do cliente;
+* Remoção de contas sem saldo.
+
+## Operações Financeiras
+
+* Depósitos;
+* Saques;
+* Transferências entre contas;
+* Consulta de saldo;
+* Consulta de extrato.
+
+## Conta Corrente
+
+* Limite especial de R$ 1.000,00;
+* Permite saldo negativo até o limite configurado.
+
+## Conta Poupança
+
+* Aplicação automática de juros pendentes durante operações da conta;
+* Aplicação retroativa de rendimentos após períodos sem movimentação;
+* Capitalização composta;
+* Registro dos rendimentos no histórico de transações.
+
+## Histórico de Transações
+
+* Depósitos;
+* Saques;
+* Transferências enviadas;
+* Transferências recebidas;
+* Rendimentos da poupança.
+
+## Modelo de Transações
+
+Todas as movimentações financeiras são registradas através da entidade `Transaction`.
+
+Os tipos de transação disponíveis são:
+
+* Depósito (DEPOSIT)
+* Saque (WITHDRAW)
+* Transferência Enviada (TRANSFER_SENT)
+* Transferência Recebida (TRANSFER_RECEIVED)
+* Rendimento (INTEREST)
+
+### Transferências
+
+Uma transferência gera duas transações independentes:
+
+* uma transação de envio (`TRANSFER_SENT`);
+* uma transação de recebimento (`TRANSFER_RECEIVED`).
+
+As duas transações possuem identificadores próprios, mas compartilham o mesmo `operationId`, permitindo rastrear toda a operação.
+
+### Rendimentos
+
+Os rendimentos da conta poupança são registrados através de transações do tipo `INTEREST`.
+
+Dessa forma, todas as alterações de saldo ficam registradas no histórico da conta.
+
+## Aplicação Preguiçosa de Juros (Lazy Interest Application)
+
+Cada conta poupança possui sua própria data de aniversário, definida pela data de criação da conta.
+
+Os rendimentos tornam-se elegíveis para aplicação nessa data.
+
+---
+
+# Arquitetura
+
+O sistema foi desenvolvido utilizando uma arquitetura em camadas, buscando separar responsabilidades e manter o domínio desacoplado de detalhes de infraestrutura.
+
+```text
+Interface de Usuário (UI)
+        │
+        ▼
+Camada de Aplicação
+(ApplicationService)
+        │
+        ▼
+Camada de Serviço
+    ↙        ↘
+Domain     Repositories
+```
+
+## Camadas
+
+### UI
+
+Responsável pela interação com o usuário.
+
+Funções:
+
+* leitura de dados;
+* exibição de informações;
+* navegação entre menus;
+* tratamento de entradas inválidas.
+
+A camada de UI não contém regras de negócio.
+
+---
+
+### Camada de Aplicação
+
+#### ApplicationContext
+
+A composição das dependências da aplicação é realizada pelo ApplicationContext, que atua como Composition Root do sistema.
+
+#### ApplicationService
+
+O ApplicationService não contém regras de negócio. Atua como fachada da aplicação, concentrando os casos de uso consumidos pela camada de Interface.
+Assim, a camada de Interface nunca acessa diretamente os serviços internos.
+
+Funções:
+
+* orquestrar casos de uso;
+* coordenar múltiplos serviços quando necessário.
+* fornecer uma interface simplificada para a camada de UI.
+
+---
+
+### Camada de Serviço
+
+Contém os serviços responsáveis por coordenar os casos de uso da aplicação.
+
+Os serviços orquestram operações envolvendo múltiplas entidades e repositórios, enquanto as regras de negócio permanecem concentradas no domínio.
+
+#### ClientService
+
+Responsável por:
+
+* cadastro de clientes;
+* alteração de dados;
+* consultas;
+* remoção de clientes.
+
+#### AccountService
+
+Responsável por:
+
+* criação de contas;
+* consulta de contas;
+* validação para remoção;
+* gerenciamento do ciclo de vida das contas.
+
+#### TransactionService
+
+Responsável por:
+
+* depósitos;
+* saques;
+* transferências;
+* geração de extratos;
+* aplicação de juros pendentes.
+
+---
+
+### Domínio
+
+Contém toda a regra de negócio do sistema.
+
+O domínio é composto por entidades, value objects, enums, exceções de domínio e regras de negócio.
+
+O domínio representa o núcleo do sistema e permanece completamente independente das camadas de aplicação, interface e persistência.
+
+As regras são implementadas diretamente nas entidades e value objects.
+
+---
+
+# Estrutura do Projeto
+
+```text
+src
+├── model
+│   ├── Account
+│   ├── CheckingAccount
+│   ├── SavingsAccount
+│   ├── Client
+│   ├── Transaction
+│   ├── AccountType
+│   └── TransactionType
+│
+├── model/valueobject
+│   ├── Money
+│   ├── Cpf
+│   ├── Email
+│   ├── PersonName
+│   ├── AccountIdentity
+│   └── AccountIdentityFactory
+│
+├── service
+│   ├── dto
+│   │    ├── ClientData
+│   │    └── StatementData
+│   ├── ClientService
+│   ├── AccountService
+│   └── TransactionService
+│
+├── application
+│    ├── ApplicationService
+│    └── ApplicationContext
+│
+├── repository
+│   ├── ClientRepository
+│   ├── AccountRepository
+│   └── TransactionRepository
+│
+├── ui
+│   ├── controller
+│   ├── formatter
+│   ├── menu
+│   ├── messages
+│   ├── selector
+│   ├── util
+│   ├── App
+│   └── Main
+│
+├── exception
+```
+
+---
+
+# Como Executar
+
+## Pré-requisitos
+
+* Java 21 ou superior
+* Maven 3.9+ (opcional, caso utilize Maven)
+
+Verifique as versões instaladas:
+
+```bash
+java --version
+mvn --version
+```
+
+---
+
+## Clonar o Repositório
+
+```bash
+git clone https://github.com/hugoovargas/sistema-bancario-java.git
+cd sistema-bancario-java
+```
+
+---
+
+## Executar a Aplicação
+
+Caso esteja utilizando uma IDE:
+
+1. Abra o projeto.
+2. Execute a classe:
+
+```
+Main.java
+```
+
+A aplicação iniciará em modo console.
+
+---
+
+## Fluxo Básico
+
+Exemplo de utilização:
+
+1. Criar cliente;
+2. Criar conta corrente ou poupança;
+3. Realizar depósitos;
+4. Realizar saques;
+5. Realizar transferências;
+6. Consultar saldo;
+7. Consultar extrato;
+8. Remover contas com saldo zerado;
+9. Remover clientes cujas contas estejam aptas para exclusão.
+
+---
+
+# Executando os Testes
+
+O projeto possui uma suíte abrangente de testes automatizados utilizando JUnit 5 e cobertura de código monitorada com JaCoCo.
+
+Executar todos os testes:
+
+```bash
+mvn test
+```
+
+Ou diretamente pela IDE.
+
+---
+
+# Cobertura de Testes
+
+Os testes cobrem:
+
+## Value Objects
+
+* CPF;
+* Email;
+* Money;
+* PersonName;
+* AccountIdentity.
+
+## Entidades
+
+* Client;
+* CheckingAccount;
+* SavingsAccount;
+* Transaction.
+
+## Camada de Aplicação
+
+* ApplicationService
+
+## Camada de Serviços
+
+* ClientService
+* AccountService
+* TransactionService
+
+## Regras de Negócio
+
+* depósitos;
+* saques;
+* transferências;
+* limite especial;
+* rendimentos da poupança;
+* geração de extratos;
+* remoção de contas;
+* remoção de clientes.
+
+## Camadas Cobertas
+
+A cobertura de código é gerada automaticamente através do JaCoCo durante a execução da pipeline do GitHub Actions.
+
+A métrica considera apenas as camadas que contêm regras de negócio e comportamento relevante para o domínio:
+
+- Value Objects;
+- Entidades;
+- Serviços;
+- Camada de Aplicação.
+
+A camada de Interface não participa da cobertura por possuir responsabilidade exclusivamente de apresentação e navegação, sem regras de negócio próprias.
+
+Dessa forma, a cobertura reflete com maior precisão a qualidade dos testes sobre o comportamento do sistema.
+
+---
+
+# Documentação Complementar
+
+A documentação técnica do projeto está dividida em arquivos específicos.
+
+|             Documento                   |               Descrição               |
+|-----------------------------------------|---------------------------------------|
+| [architecture.md](docs/architecture.md) |     Arquitetura geral do sistema      |
+| [domain.md](docs/domain.md)             | Modelo de domínio e regras de negócio |
+| [application.md](docs/application.md)   |        Camada de aplicação            |
+| [service.md](docs/service.md)           |         Serviços do sistema           |
+| [repositories.md](docs/repositories.md) |      Repositórios e persistência      |
+| [ui.md](docs/ui.md)                     |         Interface de usuário          |
+| [testing.md](docs/testing.md)           |     Estratégia e cobertura de testes  |
+
+---
+
+# Melhorias Futuras
+
+Possíveis evoluções para o projeto:
+
+## Persistência
+
+* integração com banco de dados relacional;
+* implementação utilizando JPA/Hibernate;
+* migrations com Flyway.
+
+## Arquitetura
+
+* separação em módulos Maven;
+* Introdução de contratos (interfaces) para os repositórios, permitindo múltiplas implementações de persistência.
+* Migração do Composition Root manual para um container de Injeção de Dependências (Spring, CDI ou similar).
+
+## API
+
+* criação de API REST com Spring Boot;
+* autenticação e autorização.
+
+## Observabilidade
+
+* logging estruturado;
+* métricas;
+* monitoramento.
+
+## Testes
+
+* testes de integração;
+* testes end-to-end;
+
+---
+
+# Considerações Finais
+
+Este projeto foi desenvolvido com foco em modelagem de domínio, boas práticas de orientação a objetos e organização arquitetural.
+
+A implementação prioriza:
+
+* encapsulamento;
+* modelo de domínio rico;
+* value objects imutáveis;
+* separação de responsabilidades;
+* regras de negócio explícitas;
+* testabilidade;
+* manutenção de longo prazo.
+
+O objetivo principal é servir como estudo e demonstração prática de conceitos de desenvolvimento de software aplicados a um domínio bancário simplificado.
